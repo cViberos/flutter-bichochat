@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'package:flu_bichochat/providers/auth_provider.dart';
+import 'package:flu_bichochat/helpers/mostar_alerta.dart';
 
 import '../widgets/boton_azul.dart';
 import '../widgets/custom_input.dart';
@@ -26,14 +30,14 @@ class LoginPage extends StatelessWidget {
                   ? Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Logo(titulo: 'Mensajes'),
+                        Logo(titulo: 'Mensajes'),
                         _Form(),
-                        const Labels(
+                        Labels(
                           ruta: 'register',
                           titulo: '¿No tienes cuenta?',
                           subTitulo: 'Crea una ahora!',
                         ),
-                        const Padding(
+                        Padding(
                           padding: EdgeInsets.only(bottom: 20),
                           child: Text(
                             'Desarrollado por Cristian Viberos 06/11/22',
@@ -44,7 +48,7 @@ class LoginPage extends StatelessWidget {
                     )
                   : Row(
                       children: [
-                        const SizedBox(width: 20),
+                        SizedBox(width: 20),
                         Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: const [
@@ -83,6 +87,8 @@ class _FormState extends State<_Form> {
 
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context, listen: true);
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 50),
       child: Column(
@@ -103,10 +109,24 @@ class _FormState extends State<_Form> {
           ),
           BotonAzul(
             text: 'Iniciar',
-            onPressed: () {
-              print(emailCtrl);
-              print(passCtrl);
-            },
+            onPressed: authService.autenticando
+                ? null
+                : () async {
+                    // Quita el FOCO del elemento
+                    FocusScope.of(context).unfocus();
+
+                    final loginOk = await authService.login(
+                        emailCtrl.text.trim(), passCtrl.text.trim());
+
+                    if (loginOk) {
+                      // NAVEGAR A LA PANTALLA DE USUARIOS
+                      Navigator.pushReplacementNamed(context, 'usuarios');
+                    } else {
+                      // MOSTAR ALERTA
+                      mostrarAlerta(context, 'Login incorrecto',
+                          'Revise sus credenciales nuevamente');
+                    }
+                  },
           ),
         ],
       ),

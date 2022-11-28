@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class BotonAzul extends StatelessWidget {
   final String text;
-  final Function() onPressed;
+  final Function()? onPressed;
 
   const BotonAzul({
     super.key,
@@ -16,6 +16,7 @@ class BotonAzul extends StatelessWidget {
       elevation: 2,
       highlightElevation: 5,
       color: Colors.blue,
+      disabledColor: Colors.grey,
       shape: const StadiumBorder(),
       onPressed: onPressed,
       child: SizedBox(
